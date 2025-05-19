@@ -1,0 +1,7 @@
+si a > 0:
+    si b > 0:
+        mostrar "ambos positivos"
+    sino:
+        mostrar "b no positivo"
+sino:
+    mostrar "a no positivo"

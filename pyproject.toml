@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nachlang"
+version = "0.1.0"
+description = "NachLang: lenguaje de programación de sintaxis natural"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.7"
+dependencies = [
+    "lark-parser>=0.10.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pre-commit",
+    "black",
+    "isort",
+    "flake8",
+    "coverage",
+]
+ai = [
+    "openai>=0.27.0"
+]

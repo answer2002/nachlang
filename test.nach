@@ -1,0 +1,7 @@
+mostrar "Hola mundo"
+
+si usuario == "Nacho":
+    mostrar "Bienvenido"
+sino:
+    mostrar "¿Quién eres tú?"
+terminar

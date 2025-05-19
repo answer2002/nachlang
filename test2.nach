@@ -1,0 +1,7 @@
+definir funcion saludo(nombre):
+    mostrar "Hola " + nombre
+    terminar
+
+repetir 3 veces:
+    mostrar "Repetición"
+terminar

@@ -1,0 +1,6 @@
+# Ejemplo básico de Hola Mundo en NachLang
+
+función saludar(nombre) dice:
+    imprime("Hola, " + nombre)
+
+saludar("Mundo")

@@ -1,0 +1,57 @@
+FUNCION: /funcion|function/
+DICE:    /dice|say|says/
+SI:      /si|if/
+SINO:    /sino|else/
+REPETIR: /repetir|repeat/
+VECES:   /veces|times/
+TERMINAR:/terminar|exit/
+MUESTRA: /mostrar|print/
+
+ID: /(?!funcion|function|dice|say|says|si|if|sino|else|repetir|repeat|veces|times|terminar|exit|mostrar|print)[A-Za-z_][A-Za-z0-9_]*/
+
+%import common.NUMBER
+%import common.ESCAPED_STRING   -> STRING
+_NEWLINE: /(\r?\n[ \t]*)+/
+%ignore /[ \t]+/
+%ignore /#[^\n]*/
+
+%declare _INDENT _DEDENT
+
+start: stmt+
+
+func_def: FUNCION ID "(" ")" DICE ":" _NEWLINE _INDENT stmt+ _DEDENT
+
+assign_stmt: ID "=" expr _NEWLINE
+
+print_stmt: MUESTRA expr _NEWLINE
+
+if_stmt: SI expr ":" _NEWLINE then_block else_block?
+
+then_block: _INDENT stmt+ _DEDENT
+else_block: SINO ":" _NEWLINE _INDENT stmt+ _DEDENT
+
+repeat_stmt: REPETIR NUMBER VECES ":" _NEWLINE _INDENT stmt+ _DEDENT
+
+terminate_stmt: TERMINAR _NEWLINE
+
+stmt: func_def
+    | assign_stmt
+    | print_stmt
+    | if_stmt
+    | repeat_stmt
+    | terminate_stmt
+    | call_stmt
+
+call_stmt: ID "(" [arg_list] ")" _NEWLINE
+
+arg_list: expr ("," expr)*
+
+?expr: expr "==" expr   -> eq
+     | expr ">" expr    -> gt
+     | expr "+" expr    -> add
+     | atom
+
+?atom: ID
+     | NUMBER
+     | STRING
+     | "(" expr ")"

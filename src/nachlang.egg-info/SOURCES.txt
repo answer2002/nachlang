@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+src/nachlang/__init__.py
+src/nachlang/ast.py
+src/nachlang/parser.py
+src/nachlang/repl.py
+src/nachlang/transpiler.py
+src/nachlang.egg-info/PKG-INFO
+src/nachlang.egg-info/SOURCES.txt
+src/nachlang.egg-info/dependency_links.txt
+src/nachlang.egg-info/requires.txt
+src/nachlang.egg-info/top_level.txt
+tests/test_parser.py
+tests/test_repl_ai.py
+tests/test_transpiler.py

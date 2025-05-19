@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = src/nachlang
+
+[report]
+omit =
+    tests/*

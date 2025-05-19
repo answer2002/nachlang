@@ -1,0 +1,184 @@
+(* NachLang Grammar specification in EBNF *)
+
+(* ---------------------------------------------------------------------------- *)
+(* NachLang: Lenguaje de programación con sintaxis natural,
+   diseñado para robots, sistemas autónomos e integraciones de IA.
+*)
+(* ---------------------------------------------------------------------------- *)
+
+(* ===================== *)
+(* ● Lexical / Tokens ● *)
+(* ===================== *)
+
+digit          = "0".."9" ;
+letter         = "a".."z" | "A".."Z" | "_" ;
+identifier     = letter , { letter | digit } ;
+string         = '"' , { character - { '"' | "\n" | "\r" } } , '"' ;
+number         = digit , { digit } , [ "." , { digit } ] ;
+newline        = "\r\n" | "\n" ;
+indent         = /* INDENT (basado en espacios/tabs) */ ;
+dedent         = /* DEDENT cuando se reduce la sangría */ ;
+comment        = "#" , { character - newline } , newline ;
+
+(* ---------------- *)
+(* ● Literales ● *)
+(* ---------------- *)
+
+literals       = string | number ;
+
+(* ========================= *)
+(* ● Programa y bloques ● *)
+(* ========================= *)
+
+program        = { statement } ;
+
+statement      = simple_statement | compound_statement ;
+
+simple_statement =
+    print_statement
+  | assignment_statement
+  | import_statement
+  | terminate_statement
+  | expression_statement
+  ;
+
+compound_statement =
+    if_statement
+  | if_else_statement
+  | repeat_statement
+  | while_statement
+  | function_definition
+  | event_handler
+  ;
+
+(* ----------------------- *)
+(* ● Import y librerías ● *)
+(* ----------------------- *)
+
+import_statement =
+    "importar" , module_name , { "." , module_name } , newline ;
+
+module_name    = identifier ;
+
+(* ------------------------------ *)
+(* ● Mostrar / salida estándar ● *)
+(* ------------------------------ *)
+
+print_statement =
+    "mostrar" , expression , newline ;
+
+(* ------------------------------- *)
+(* ● Asignación de variables ● *)
+(* ------------------------------- *)
+
+assignment_statement =
+    identifier , "=" , expression , newline ;
+
+(* ---------------------------- *)
+(* ● Llamada a expresiones ● *)
+(* ---------------------------- *)
+
+expression_statement =
+    expression , newline ;
+
+(* -------------------------- *)
+(* ● Finalización de programa ● *)
+(* -------------------------- *)
+
+terminate_statement =
+    "terminar" , newline ;
+
+(* ==================================== *)
+(* ● Estructuras de control de flujo ● *)
+(* ==================================== *)
+
+if_statement =
+    "si" , expression , ":" , newline , indent,
+      { statement }
+    , dedent
+  ;
+
+if_else_statement =
+    "si" , expression , ":" , newline , indent,
+      { statement }
+    , dedent,
+    "sino" , ":" , newline , indent,
+      { statement }
+    , dedent
+  ;
+
+while_statement =
+    "mientras" , expression , ":" , newline , indent,
+      { statement }
+    , dedent
+  ;
+
+repeat_statement =
+    "repetir" , number , "veces" , ":" , newline , indent,
+      { statement }
+    , dedent
+  ;
+
+(* ======================== *)
+(* ● Definición de funciones ● *)
+(* ======================== *)
+
+function_definition =
+    [ "async" ] , "definir" , "funcion" , identifier , "(" , [ parameter_list ] , ")" , ":" , newline , indent,
+      { statement }
+    , dedent
+  ;
+
+parameter_list =
+    identifier , { "," , identifier }
+  ;
+
+(* ====================================== *)
+(* ● Manejadores de eventos (robots/IA) ● *)
+(* ====================================== *)
+
+event_handler =
+    "cuando" , event_type , ":" , newline , indent,
+      { statement }
+    , dedent
+  ;
+
+event_type =
+    identifier
+  ;
+
+(* ==================== *)
+(* ● Expresiones ● *)
+(* ==================== *)
+
+expression      = logical_or ;
+
+logical_or      = logical_and , { "o" , logical_and } ;
+logical_and     = comparison , { "y" , comparison } ;
+
+comparison      = additive , [ ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) , additive ] ;
+
+additive        = multiplicative , { ( "+" | "-" ) , multiplicative } ;
+multiplicative  = unary , { ( "*" | "/" | "%" ) , unary } ;
+
+unary           = [ ( "+" | "-" | "no" ) ] , primary ;
+
+primary         =
+    identifier
+  | number
+  | string
+  | "(" , expression , ")"
+  | function_call
+  ;
+
+function_call   = identifier , "(" , [ argument_list ] , ")" ;
+
+argument_list   = expression , { "," , expression } ;
+
+(* ====================== *)
+(* ● Espacios y fin de archivo ● *)
+(* ====================== *)
+
+module_end      = /* fin de archivo */ ;
+
+(* Fin de la gramática NachLang *)
