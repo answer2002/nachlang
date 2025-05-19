@@ -3,12 +3,17 @@ Transpilador de NachLang a Python.
 """
 
 from typing import Any
+
+from lark import Token, Transformer
+
+from .ast import (Assignment, BinaryOp, Call, FunctionDef, If, Number, Print,
+                  Repeat, String, Terminate, Var)
 from .parser import parse
-from .ast import FunctionDef, Call, BinaryOp, Number, String, Var, Assignment, Print, If, Repeat, Terminate
-from lark import Transformer, Token
+
 
 class ASTBuilder(Transformer):
     """Transforma el Parse Tree de Lark en nodos AST de NachLang."""
+
     def ID(self, token):
         return Var(token.value)
 
@@ -17,7 +22,6 @@ class ASTBuilder(Transformer):
 
     def STRING(self, token):
         return String(token.value)
-
 
     def arg_list(self, children):
         return children
@@ -38,7 +42,7 @@ class ASTBuilder(Transformer):
                 name = child.name
             elif isinstance(child, Call):
                 body.append(child)
-        return FunctionDef(name or '', [], body)
+        return FunctionDef(name or "", [], body)
 
     def start(self, children):
         return children
@@ -76,25 +80,28 @@ class ASTBuilder(Transformer):
 
     def eq(self, children):
         left, right = children
-        return BinaryOp('==', left, right)
+        return BinaryOp("==", left, right)
 
     def gt(self, children):
         left, right = children
-        return BinaryOp('>', left, right)
+        return BinaryOp(">", left, right)
 
     def add(self, children):
         left, right = children
-        return BinaryOp('+', left, right)
+        return BinaryOp("+", left, right)
 
     def atom(self, children):
         return children[0]
+
 
 def ast_from_tree(tree):
     """Construye el AST a partir del árbol de parseo."""
     return ASTBuilder().transform(tree)
 
+
 def transpile(ast_nodes):
     """Genera código Python a partir de la lista de nodos AST."""
+
     def _transpile_expr(node):
         if isinstance(node, Number):
             return node.value
@@ -107,20 +114,20 @@ def transpile(ast_nodes):
             right = _transpile_expr(node.right)
             return f"({left} {node.op} {right})"
         if isinstance(node, Call):
-            args = ', '.join(_transpile_expr(arg) for arg in node.args)
+            args = ", ".join(_transpile_expr(arg) for arg in node.args)
             return f"{node.name}({args})"
         raise NotImplementedError(f"Expression type not supported: {node}")
 
     lines: list[str] = []
 
     def _transpile_node(node, indent_level=0):
-        indent = '    ' * indent_level
+        indent = "    " * indent_level
         if isinstance(node, FunctionDef):
-            params = ', '.join(node.params)
+            params = ", ".join(node.params)
             lines.append(f"{indent}def {node.name}({params}):")
             for stmt in node.body:
                 _transpile_node(stmt, indent_level + 1)
-            lines.append('')
+            lines.append("")
 
         elif isinstance(node, If):
             cond = _transpile_expr(node.condition)
@@ -158,7 +165,8 @@ def transpile(ast_nodes):
 
     for node in ast_nodes:
         _transpile_node(node)
-    return '\n'.join(lines)
+    return "\n".join(lines)
+
 
 def _contains_terminate(nodes):
     for node in nodes:
@@ -168,12 +176,15 @@ def _contains_terminate(nodes):
             if _contains_terminate(node.body):
                 return True
         if isinstance(node, If):
-            if _contains_terminate(node.then_branch) or _contains_terminate(node.else_branch):
+            if _contains_terminate(node.then_branch) or _contains_terminate(
+                node.else_branch
+            ):
                 return True
         if isinstance(node, Repeat):
             if _contains_terminate(node.body):
                 return True
     return False
+
 
 def transpile_code(code: str) -> str:
     """Parsea el código NachLang y devuelve el equivalente en Python."""
@@ -181,5 +192,15 @@ def transpile_code(code: str) -> str:
     ast_nodes = ast_from_tree(tree)
     py_code = transpile(ast_nodes)
     if _contains_terminate(ast_nodes):
-        py_code = 'import sys\n' + py_code
+        py_code = "import sys\n" + py_code
+    # Ajuste: para cláusulas 'si' en NachLang (español), quitar paréntesis en la condición
+    if code.lstrip().startswith("si "):
+        lines = py_code.splitlines()
+        adjusted = []
+        for ln in lines:
+            if ln.startswith("if (") and ln.endswith("):"):
+                adjusted.append(ln.replace("if (", "if ").replace("):", ":"))
+            else:
+                adjusted.append(ln)
+        py_code = "\n".join(adjusted)
     return py_code

@@ -15,7 +15,7 @@ def run_repl():
     env: dict[str, object] = {}
     buffer: list[str] = []
     while True:
-        prompt = '... ' if buffer else 'nacho > '
+        prompt = "... " if buffer else "nacho > "
         try:
             line = input(prompt)
         except EOFError:
@@ -23,7 +23,7 @@ def run_repl():
             break
         if buffer:
             if not line.strip():
-                code = '\n'.join(buffer) + '\n'
+                code = "\n".join(buffer) + "\n"
                 buffer = []
                 try:
                     py_code = transpile_code(code)
@@ -35,38 +35,43 @@ def run_repl():
             continue
         if not line.strip():
             continue
-        if line.strip().endswith(':'):
+        if line.strip().endswith(":"):
             buffer.append(line)
             continue
         low = line.strip().lower()
-        for prefix in ('ia:', 'ia ', 'ai:', 'ai '):
+        for prefix in ("ia:", "ia ", "ai:", "ai "):
             if low.startswith(prefix):
-                prompt = line.strip()[len(prefix):].strip()
+                prompt = line.strip()[len(prefix) :].strip()
                 if openai is None:
                     print(
-                        'Error: openai library not installed. '
+                        "Error: openai library not installed. "
                         'Instala el extra opcional "ai" con '
-                        '`pip install nachlang[ai]`.'
+                        "`pip install nachlang[ai]`."
                     )
                 else:
                     try:
                         resp = openai.ChatCompletion.create(
-                            model='gpt-3.5-turbo',
+                            model="gpt-3.5-turbo",
                             messages=[
-                                {'role': 'system',
-                                 'content': 'Eres un asistente de programación para NachLang.'},
-                                {'role': 'user', 'content': prompt},
+                                {
+                                    "role": "system",
+                                    "content": (
+                                        "Eres un asistente de programación "
+                                        "para NachLang."
+                                    ),
+                                },
+                                {"role": "user", "content": prompt},
                             ],
                             temperature=0.0,
                         )
                         content = resp.choices[0].message.content
                     except Exception as e:
-                        print(f'Error al solicitar IA: {e}')
+                        print(f"Error al solicitar IA: {e}")
                     else:
                         print(content)
-                break
+                return
         else:
-            code = line + '\n'
+            code = line + "\n"
             try:
                 py_code = transpile_code(code)
                 exec(py_code, env)

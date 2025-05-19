@@ -3,7 +3,8 @@ Definición de nodos del AST (Abstract Syntax Tree) de NachLang.
 """
 
 from dataclasses import dataclass
-from typing import List, Any
+from typing import Any, List
+
 
 @dataclass
 class FunctionDef:
@@ -11,10 +12,12 @@ class FunctionDef:
     params: List[str]
     body: List[Any]
 
+
 @dataclass
 class Call:
     name: str
     args: List[Any]
+
 
 @dataclass
 class BinaryOp:
@@ -22,13 +25,16 @@ class BinaryOp:
     left: Any
     right: Any
 
+
 @dataclass
 class Number:
     value: str
 
+
 @dataclass
 class String:
     value: str
+
 
 @dataclass
 class Var:

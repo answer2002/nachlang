@@ -5,4 +5,3 @@ si usuario == "Nacho":
     mostrar "Bienvenido, maestro"
 sino:
     mostrar "¿Quién eres tú?"
-
