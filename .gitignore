@@ -1,0 +1,9 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# PyTest cache and other files
+.pytest_cache/
+
+# macOS
+.DS_Store
