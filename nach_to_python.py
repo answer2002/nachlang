@@ -11,7 +11,7 @@ REGLAS = [
     (r"^repetir (\d+) veces:", r"for _ in range(\1):"),
     (r"^definir funcion (.*)", r"def \1"),
     (r"^terminar", r"exit()"),
-    (r"^#(.*)", r"#\1")
+    (r"^#(.*)", r"#\1"),
 ]
 
 ESPACIO = "    "
@@ -25,7 +25,7 @@ def convertir_linea(linea):
 
 
 def convertir_archivo(archivo_entrada, archivo_salida):
-    with open(archivo_entrada, 'r', encoding='utf-8') as f:
+    with open(archivo_entrada, "r", encoding="utf-8") as f:
         lineas = f.readlines()
 
     resultado = []
@@ -49,7 +49,7 @@ def convertir_archivo(archivo_entrada, archivo_salida):
             else:
                 resultado.append(ESPACIO * indentacion + convertir_linea(linea))
 
-    with open(archivo_salida, 'w', encoding='utf-8') as f:
+    with open(archivo_salida, "w", encoding="utf-8") as f:
         f.write("\n".join(resultado))
 
     print(f"✅ Archivo convertido guardado como: {archivo_salida}")
@@ -57,4 +57,3 @@ def convertir_archivo(archivo_entrada, archivo_salida):
 
 if __name__ == "__main__":
     convertir_archivo("ejemplo.nach", "ejemplo_convertido.py")
-
